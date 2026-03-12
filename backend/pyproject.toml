@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "fpdf2>=2.8.7",
     "gitignore>=0.0.8",
+    "openpyxl>=3.1.5",
     "pandas>=3.0.1",
 ]
