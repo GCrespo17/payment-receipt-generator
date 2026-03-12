@@ -4,4 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fpdf2>=2.8.7",
+    "gitignore>=0.0.8",
+    "pandas>=3.0.1",
+]
