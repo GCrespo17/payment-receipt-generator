@@ -59,7 +59,18 @@ def parse_to_decimal(value, precision:Decimal = Decimal("0.01"))->Decimal:
         decimal_value = parse_mixed_number(str(value))
     return decimal_value.quantize(precision, rounding=ROUND_HALF_UP)
 
+def format_currency_ve(value) ->str:
+    if pd.isna(value):
+        return ""
+    d = value if isinstance(value, Decimal) else Decimal(str(value))
+    us = f"{d:,.2f}"
+    return us.replace(",", "_").replace(".", ",").replace("_", ".")
+
 def clean_numeric_column(data_frame:pd.DataFrame, column_name:str, )->None:
     data_frame[column_name] = data_frame[column_name].map(parse_to_decimal)
+
+def intersection_of_payments(requested_payment_data:pd.DataFrame, requested_payment_row:str, recieved_payment_data:pd.DataFrame, recieved_payment_row:str):
+    intersection_dataframe = recieved_payment_data[recieved_payment_data[recieved_payment_row].isin(requested_payment_data[requested_payment_row])]
+    return intersection_dataframe
 
 
