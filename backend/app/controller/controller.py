@@ -82,6 +82,12 @@ def req_payment_columns(session_id:uuid.UUID)->list[str]:
     columns = data_ingestion.extract_column_names(data_frame)
     return columns
 
+def load_row_names(session_id:uuid.UUID, req_payment_column:str, recv_payment_column:str)->None:
+    session = get_session(session_id)
+    session.req_payment_column_name = req_payment_column
+    session.recv_payment_column_name = recv_payment_column
+
+
 
     
 
