@@ -18,6 +18,9 @@ def extract_data_from_excelsheet(excel_path:Path, sheet_name:str, header_row_ind
     sheet_dataframe = pd.read_excel(excel_path, sheet_name = sheet_name, skiprows=header_row_index)
     return sheet_dataframe
 
+def extract_column_names(data:pd.DataFrame)->list[str]:
+    return list(data.columns)
+
 def parse_mixed_number(number_string:str)->Decimal:
     number_string = number_string.strip().replace(" ", "")
     
