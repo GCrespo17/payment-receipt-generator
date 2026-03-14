@@ -1,7 +1,8 @@
+import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 import app.controller.controller as controller
-from app.schemas.responses import SessionCreation, SheetNameRequest, SheetNameResponse
+from app.schemas.responses import SessionCreation, SheetNameRequest, SheetNameResponse, GeneratePDFRequest
 class UploadResponse(BaseModel):
     user_id:str
     file_name:str
@@ -36,6 +37,18 @@ def upload_sheet_names(request_values:SheetNameRequest)->SheetNameResponse:
         )
     except ValueError as exception:
         raise HTTPException(status_code=400, detail=str(exception))
+
+@router.post("/columns", status_code=200)
+def input_columns(session_id:uuid.UUID, req_column:str, recv_column:str)->None:
+    controller.load_column_names(session_id, req_column, recv_column)
+
+@router.post("/pdf", status_code=201)
+def create_pdf_batch(request_values:GeneratePDFRequest):
+    try:
+        controller.generate_all_pdf(request_values.session_id, request_values.pdf_header)
+    except ValueError as exception:
+        raise HTTPException(status_code=400, detail=str(exception))
+
 
 
 
