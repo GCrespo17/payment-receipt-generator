@@ -2,20 +2,14 @@ import pandas as pd
 from pathlib import Path
 from decimal import Decimal, ROUND_HALF_UP
 import re
-
-
-"""
- CREATION OF BASIC ETL
-   THIS PROGRAM EXTRACTS DATA FROM EXCEL FILES AND GENERATES A PDF
-   BASED ON DEMANDED INFORMATION
-"""
+import math
 
 def extract_sheet_names_from_excel(excel_path:Path)->list[str]:
     sheet_names = pd.ExcelFile(excel_path).sheet_names
     return sheet_names
 
 def extract_data_from_excelsheet(excel_path:Path, sheet_name:str, header_row_index=0)->pd.DataFrame:
-    sheet_dataframe = pd.read_excel(excel_path, sheet_name = sheet_name, skiprows=header_row_index)
+    sheet_dataframe = pd.read_excel(excel_path, sheet_name = sheet_name, skiprows=header_row_index, keep_default_na=False)
     return sheet_dataframe
 
 def extract_column_names(data:pd.DataFrame)->list[str]:
@@ -66,11 +60,26 @@ def format_currency_ve(value) ->str:
     us = f"{d:,.2f}"
     return us.replace(",", "_").replace(".", ",").replace("_", ".")
 
-def clean_numeric_column(data_frame:pd.DataFrame, column_name:str, )->None:
+def clean_numeric_column(data_frame, column_name:str, )->None:
     data_frame[column_name] = data_frame[column_name].map(parse_to_decimal)
 
 def intersection_of_payments(requested_payment_data:pd.DataFrame, requested_payment_row:str, recieved_payment_data:pd.DataFrame, recieved_payment_row:str):
     intersection_dataframe = recieved_payment_data[recieved_payment_data[recieved_payment_row].isin(requested_payment_data[requested_payment_row])]
     return intersection_dataframe
 
+def data_to_text(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float) and math.isnan(value):
+        return ""
+    return str(value).strip()
 
+def normalize_reference(value: str) -> str:
+    value = value.strip()
+    if not value:
+        return ""
+    if "." in value:
+        value = value.split(".", 1)[0].strip()
+    if not value.isdigit():
+        raise ValueError(f"Invalid transaction reference: {value}")
+    return value.zfill(8)
