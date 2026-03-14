@@ -76,7 +76,8 @@ def generate_pdf(header_data:PDFHeader, payment_data:PDFPaymentData, pdf_path:Pa
     pdf = create_pdf()
     create_header(pdf, IMAGE_DIR, header_data)
     create_payment_data(pdf, payment_data)
-    output_filename = "".join(c for c in payment_data.name if c.isalnum() or c in " _-").strip()
+    safe_filename = "".join(c for c in payment_data.name if c.isalnum() or c in " _-").strip()
+    output_filename = f"{safe_filename}.pdf"
     pdf_path_name= pdf_path / output_filename
     pdf.output(str(pdf_path_name))
 
