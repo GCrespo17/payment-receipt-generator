@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from uuid import UUID
+from app.models.pdf_data import PDFHeader
 
 class SessionCreation(BaseModel):
     session_id:UUID
@@ -15,5 +16,8 @@ class SheetNameRequest(BaseModel):
 class SheetNameResponse(BaseModel):
     req_payment_columns:list[str]
     recv_payment_columns:list[str]
-    
+
+class GeneratePDFRequest(BaseModel):
+    session_id:UUID
+    pdf_header:PDFHeader
 
