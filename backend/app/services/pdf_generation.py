@@ -1,6 +1,4 @@
-
 from pathlib import Path
-import os
 from fpdf import FPDF
 from app.models.pdf_data import PDFHeader, PDFPaymentData
 
@@ -43,15 +41,15 @@ def create_header(pdf:FPDF, image_path:Path, header_data:PDFHeader)->None:
         pdf.set_font("helvetica", "", 9)
         pdf.cell(0, 5, value, ln=1)
 
-    pdf.ln(2)
+    pdf.ln(5)
 
 def create_payment_data(pdf:FPDF, payment_data:PDFPaymentData)->None:
     headers = ["TIPO DE INFORMACIÓN", "REFERENCIA", "C.I/R.I.F", "NOMBRE", "NÚMERO DE CUENTA", "MONTO", "ESTATUS"]
 
     # Adjust column widths to fit A4 Portrait width (approx 190mm available)
-    col_widths = [35, 22, 22, 38, 40, 15, 28]
+    col_widths = [32, 22, 20, 75, 40, 28, 45]
 
-    pdf.set_font("helvetica", "B", 8)
+    pdf.set_font("helvetica", "B", 7)
     for i in range(len(headers)):
         pdf.cell(col_widths[i], 5, headers[i], border=0, ln=0, align="L")
     pdf.ln(5)
@@ -66,18 +64,18 @@ def create_payment_data(pdf:FPDF, payment_data:PDFPaymentData)->None:
                 payment_data.status
     ]
 
-    pdf.set_font("helvetica", "", 8)
+    pdf.set_font("helvetica", "", 7)
     for i in range(len(data)):
         pdf.cell(col_widths[i], 5, data[i], border=0, ln=0, align="L")
     pdf.ln(5)
 
 
-def generate_pdf(header_data:PDFHeader, payment_data:PDFPaymentData, pdf_path:Path):
+def generate_pdf(header_data:PDFHeader, payment_data:PDFPaymentData, pdf_path:Path, normalized_reference:str):
     pdf = create_pdf()
     create_header(pdf, IMAGE_DIR, header_data)
     create_payment_data(pdf, payment_data)
     safe_filename = "".join(c for c in payment_data.name if c.isalnum() or c in " _-").strip()
-    output_filename = f"{safe_filename}.pdf"
+    output_filename = f"{safe_filename}{normalized_reference}.pdf"
     pdf_path_name= pdf_path / output_filename
     pdf.output(str(pdf_path_name))
 
