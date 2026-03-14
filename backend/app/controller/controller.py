@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from fastapi import UploadFile
 import uuid
 import app.services.directory_management as dir_management
@@ -87,11 +88,6 @@ def load_row_names(session_id:uuid.UUID, req_payment_column:str, recv_payment_co
     session.req_payment_column_name = req_payment_column
     session.recv_payment_column_name = recv_payment_column
 
-
-
-    
-
-    
 
 
 
