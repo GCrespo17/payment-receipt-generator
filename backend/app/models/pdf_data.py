@@ -9,6 +9,7 @@ class PDFHeader():
     sent_date:str
     process_date:str
 
+@dataclass()
 class PDFPaymentData():
     information_type:str
     reference:str
