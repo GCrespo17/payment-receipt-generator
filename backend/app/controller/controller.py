@@ -152,7 +152,7 @@ def generate_all_pdf(session_id:uuid.UUID, pdf_header:PDFHeader)->None:
 
 def get_zip_file_response(session_id:uuid.UUID)->FileResponse:
     session = get_session(session_id)
-    zip_path = zip_pdf_directory(session.session_directory, str(session_id))
+    zip_path = zip_pdf_directory(session.session_directory)
     return FileResponse(
         path=zip_path,
         media_type="application/zip",
