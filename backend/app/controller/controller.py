@@ -1,10 +1,12 @@
-from fastapi import UploadFile
+from fastapi import UploadFile 
+from fastapi.responses import FileResponse
 import uuid
 import app.services.directory_management as dir_management
 import app.services.data_ingestion as data_ingestion
 from app.services.pdf_generation import generate_pdf
 from app.models.session_data import SessionData
 from app.models.pdf_data import PDFHeader, PDFPaymentData
+from app.services.compression import zip_pdf_directory
 
 
 sessions:dict[uuid.UUID, SessionData] = {}
@@ -146,4 +148,14 @@ def generate_all_pdf(session_id:uuid.UUID, pdf_header:PDFHeader)->None:
             status = data_ingestion.data_to_text(row.get("ESTATUS")),
         )
         generate_pdf(pdf_header, payment_data, session.session_directory, data_ingestion.normalize_reference(data_ingestion.data_to_text(row.get("REFERENCIA"))))
+
+
+def get_zip_file_response(session_id:uuid.UUID)->FileResponse:
+    session = get_session(session_id)
+    zip_path = zip_pdf_directory(session.session_directory, str(session_id))
+    return FileResponse(
+        path=zip_path,
+        media_type="application/zip",
+        filename=str(session_id)
+    )
 
