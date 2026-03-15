@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv
+__pycache__
+.ruff_cache
+tmp
+*.pyc
+*.pyo
+*.pyd
+*.log
