@@ -52,3 +52,41 @@ def cleanup_session_artifacts(session_id:uuid.UUID, session_directory:Path, zip_
             f"Failed to remove directory for session {session_id}: {exception}"
         )
 
+def session_zip_path(session_id:uuid.UUID)->Path:
+    return STORAGE_DIR / f"{session_id}.zip"
+
+def cleanup_storage_orphans(active_session_ids:set[uuid.UUID])->None:
+    STORAGE_DIR.mkdir(parents=True, exist_ok=True)
+    active_names = {str(session_id) for session_id in active_session_ids}
+    for item in STORAGE_DIR.iterdir():
+        item_name = item.name
+        if item.is_file() and item_name.endswith(".zip"):
+            session_name = item_name[:-4]
+        elif item.is_dir():
+            session_name = item_name
+        else:
+            continue
+        try:
+            uuid.UUID(session_name)
+        except ValueError:
+            continue
+        if session_name in active_names:
+            continue
+        try:
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink(missing_ok=True)
+        except Exception as exception:
+            logging.warning(f"Failed to remove orphan artifact {item}: {exception}")
+
+def cleanup_storage_dir_on_startup()->None:
+    STORAGE_DIR.mkdir(parents=True, exist_ok=True)
+    for item in STORAGE_DIR.iterdir():
+        try:
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink(missing_ok=True)
+        except Exception as exception:
+            logging.warning(f"Failed to cleanup startup artifact {item}: {exception}")
