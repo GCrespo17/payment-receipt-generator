@@ -22,7 +22,8 @@ type PdfHeader = {
   process_date: string
 }
 
-const API_PREFIX = '/api/v1/receipts'
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/$/, '') ?? ''
+const API_PREFIX = configuredApiBase ? `${configuredApiBase}/api/v1/receipts` : '/api/v1/receipts'
 
 const stage = ref<Stage>('upload')
 const selectedFile = ref<File | null>(null)
