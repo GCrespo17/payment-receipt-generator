@@ -53,6 +53,7 @@ const loading = ref(false)
 const generating = ref(false)
 const generated = ref(false)
 const downloading = ref(false)
+const zipDownloaded = ref(false)
 
 const stageIndex = computed(() => {
   if (stage.value === 'upload') return 1
@@ -115,6 +116,7 @@ async function uploadExcelFile(): Promise<void> {
     recvPaymentSheet.value = data.sheet_names[0] ?? ''
     reqPaymentIndex.value = 0
     recvPaymentIndex.value = 0
+    zipDownloaded.value = false
 
     stage.value = 'sheetSelection'
   } catch (error) {
@@ -215,6 +217,7 @@ async function generateReceipts(): Promise<void> {
   stage.value = 'result'
   generating.value = true
   generated.value = false
+  zipDownloaded.value = false
 
   try {
     const response = await fetch(`${API_PREFIX}/pdf`, {
@@ -251,6 +254,10 @@ function getDownloadFileName(contentDisposition: string | null): string {
 }
 
 async function downloadZip(): Promise<void> {
+  if (zipDownloaded.value) {
+    return
+  }
+
   downloading.value = true
   uiError.value = ''
 
@@ -274,11 +281,41 @@ async function downloadZip(): Promise<void> {
     link.click()
     link.remove()
     URL.revokeObjectURL(url)
+    zipDownloaded.value = true
   } catch (error) {
     uiError.value = error instanceof Error ? error.message : 'No se pudo descargar el archivo .zip.'
   } finally {
     downloading.value = false
   }
+}
+
+function resetFlow(): void {
+  stage.value = 'upload'
+  selectedFile.value = null
+  sessionId.value = ''
+  sheetNames.value = []
+  reqPaymentSheet.value = ''
+  recvPaymentSheet.value = ''
+  reqPaymentIndex.value = 0
+  recvPaymentIndex.value = 0
+  reqColumns.value = []
+  recvColumns.value = []
+  reqColumn.value = ''
+  recvColumn.value = ''
+  pdfHeader.value = {
+    company_name: '',
+    rif: '',
+    doc_type: '',
+    doc_number: '',
+    sent_date: '',
+    process_date: '',
+  }
+  uiError.value = ''
+  loading.value = false
+  generating.value = false
+  generated.value = false
+  downloading.value = false
+  zipDownloaded.value = false
 }
 </script>
 
@@ -413,9 +450,10 @@ async function downloadZip(): Promise<void> {
         <div v-else-if="generated" class="download-box">
           <span class="download-icon" aria-hidden="true">📄</span>
           <p>Recibos generados exitosamente.</p>
-          <button class="btn" type="button" :disabled="downloading" @click="downloadZip">
-            {{ downloading ? 'Descargando...' : 'Descargar' }}
+          <button class="btn" type="button" :disabled="downloading || zipDownloaded" @click="downloadZip">
+            {{ downloading ? 'Descargando...' : zipDownloaded ? 'Zip downloaded' : 'Descargar' }}
           </button>
+          <button class="btn btn--secondary" type="button" @click="resetFlow">Reiniciar Flujo</button>
         </div>
       </section>
     </section>
@@ -537,6 +575,12 @@ async function downloadZip(): Promise<void> {
 .btn:disabled {
   cursor: not-allowed;
   opacity: 0.64;
+}
+
+.btn--secondary {
+  color: var(--ink-900);
+  background: linear-gradient(180deg, #ffffff, #eff5fb);
+  border: 1px solid var(--ink-250);
 }
 
 .error-banner {
