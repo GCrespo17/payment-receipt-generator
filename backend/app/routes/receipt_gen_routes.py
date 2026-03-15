@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 import app.controller.controller as controller
 from app.schemas.responses import SessionCreation, SheetNameRequest, SheetNameResponse, GeneratePDFRequest
@@ -48,6 +48,15 @@ def create_pdf_batch(request_values:GeneratePDFRequest):
         controller.generate_all_pdf(request_values.session_id, request_values.pdf_header)
     except ValueError as exception:
         raise HTTPException(status_code=400, detail=str(exception))
+
+@router.get("/zip", status_code=200)
+async def download_pdfs(session_id:uuid.UUID, background_tasks:BackgroundTasks):
+    try:
+        return controller.get_zip_file_response(session_id, background_tasks)
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=str(exception))
+
+
 
 
 
