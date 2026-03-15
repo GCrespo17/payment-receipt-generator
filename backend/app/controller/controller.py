@@ -12,6 +12,7 @@ from app.services.compression import zip_pdf_directory
 sessions:dict[uuid.UUID, SessionData] = {}
 
 def create_session()->uuid.UUID:
+    dir_management.cleanup_storage_orphans(set(sessions.keys()))
     new_session_id = uuid.uuid4()
     new_session_dir = dir_management.create_session_dir(new_session_id)
     new_session = SessionData(session_directory=new_session_dir)
