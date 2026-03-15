@@ -1,35 +1,14 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  width: 100%;
+  min-height: 100vh;
+  padding: clamp(1rem, 2.4vw, 2rem);
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+body {
+  background:
+    radial-gradient(1600px 600px at 8% -10%, rgba(102, 192, 203, 0.34), transparent 60%),
+    radial-gradient(1000px 440px at 100% 0%, rgba(85, 129, 182, 0.3), transparent 65%),
+    linear-gradient(165deg, #f5fafc 0%, #eaf1f6 100%);
 }
