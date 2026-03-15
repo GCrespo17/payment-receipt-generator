@@ -1,4 +1,4 @@
-from fastapi import UploadFile 
+from fastapi import UploadFile, BackgroundTasks
 from fastapi.responses import FileResponse
 import uuid
 import app.services.directory_management as dir_management
@@ -150,9 +150,16 @@ def generate_all_pdf(session_id:uuid.UUID, pdf_header:PDFHeader)->None:
         generate_pdf(pdf_header, payment_data, session.session_directory, data_ingestion.normalize_reference(data_ingestion.data_to_text(row.get("REFERENCIA"))))
 
 
-def get_zip_file_response(session_id:uuid.UUID)->FileResponse:
+def get_zip_file_response(session_id:uuid.UUID, background_tasks:BackgroundTasks)->FileResponse:
     session = get_session(session_id)
     zip_path = zip_pdf_directory(session.session_directory)
+    background_tasks.add_task(
+        dir_management.cleanup_session_artifacts,
+        session_id,
+        session.session_directory,
+        zip_path
+    )
+    sessions.pop(session_id, None)
     return FileResponse(
         path=zip_path,
         media_type="application/zip",
