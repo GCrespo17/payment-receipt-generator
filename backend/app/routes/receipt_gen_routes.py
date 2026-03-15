@@ -49,6 +49,15 @@ def create_pdf_batch(request_values:GeneratePDFRequest):
     except ValueError as exception:
         raise HTTPException(status_code=400, detail=str(exception))
 
+@router.get("/zip", status_code=200)
+async def download_pdfs(session_id:uuid.UUID):
+    try:
+        return controller.get_zip_file_response(session_id)
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=str(exception))
+
+
+
 
 
 
