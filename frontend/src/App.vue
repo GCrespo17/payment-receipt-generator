@@ -22,6 +22,24 @@ type PdfHeader = {
   process_date: string
 }
 
+type DesktopDownloadResult = {
+  saved: boolean
+  path?: string
+  error?: string
+}
+
+type DesktopApi = {
+  download_zip: (sessionId: string) => Promise<DesktopDownloadResult>
+}
+
+declare global {
+  interface Window {
+    pywebview?: {
+      api?: DesktopApi
+    }
+  }
+}
+
 const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/$/, '') ?? ''
 const API_PREFIX = configuredApiBase ? `${configuredApiBase}/api/v1/receipts` : '/api/v1/receipts'
 
@@ -263,6 +281,16 @@ async function downloadZip(): Promise<void> {
   uiError.value = ''
 
   try {
+    const desktopApi = window.pywebview?.api
+    if (desktopApi?.download_zip) {
+      const result = await desktopApi.download_zip(sessionId.value)
+      if (!result.saved) {
+        throw new Error(result.error ?? 'No se pudo guardar el archivo .zip.')
+      }
+      zipDownloaded.value = true
+      return
+    }
+
     const query = new URLSearchParams({ session_id: sessionId.value })
 
     const response = await fetch(`${API_PREFIX}/zip?${query.toString()}`)

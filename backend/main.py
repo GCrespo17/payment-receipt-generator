@@ -1,11 +1,17 @@
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 import app.services.directory_management as dir_management
 from app.routes.receipt_gen_routes import router as receipt_router
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_DIST_DIR = PROJECT_ROOT / "frontend" / "dist"
 
 
 def get_allowed_origins() -> list[str]:
@@ -36,3 +42,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(receipt_router, prefix="/api/v1", tags=["payment_receipts"])
+
+if FRONTEND_DIST_DIR.exists():
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST_DIR, html=True), name="frontend")
