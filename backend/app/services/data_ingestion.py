@@ -69,7 +69,9 @@ def clean_numeric_column(data_frame, column_name:str, )->None:
     data_frame[column_name] = data_frame[column_name].map(safe_parse)
 
 def intersection_of_payments(requested_payment_data:pd.DataFrame, requested_payment_row:str, recieved_payment_data:pd.DataFrame, recieved_payment_row:str):
-    intersection_dataframe = recieved_payment_data[recieved_payment_data[recieved_payment_row].isin(requested_payment_data[requested_payment_row])]
+    requested_keys = requested_payment_data[requested_payment_row].dropna()
+    intersection_dataframe = recieved_payment_data[recieved_payment_data[recieved_payment_row].notna()
+                                        & recieved_payment_data[recieved_payment_row].isin(requested_keys)]
     return intersection_dataframe
 
 def data_to_text(value: object) -> str:
